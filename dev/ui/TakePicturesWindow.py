@@ -113,6 +113,6 @@ class Ui_TakeTrainingPictures(QWidget):
         if self.frame.any() != None:
             print("Image saved")
             date = dt.now()
-            img_name = "crayorescent_"+str(date.year)+str(date.month)+str(date.day)+"_"+str(date.hour)+str(date.minute)+str(date.second)+str(date.microsecond%10)+".png"
+            img_name = "crayorescent_"+str(date.year)+str(date.month)+str(date.day)+"_"+str(date.hour)+str(date.minute)+str(date.second)+str(date.microsecond%10)+".jpg"
             path = "C:/Users/gnest/Documents/GitHub/C61-ProjetSynthese/dev/img/"
             cv2.imwrite(os.path.join(path, img_name), self.frame)
