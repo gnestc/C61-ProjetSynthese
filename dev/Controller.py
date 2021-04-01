@@ -1,12 +1,12 @@
 import Model
 import View
-import ProcessImages
+import GetPixels
 
 class Controller:
     def __init__(self, ):
-        self.process = ProcessImages.processImage(self)
-        #self.model = Model.Model(self)
-        #self.view = View.View(self)
+        #self.process = GetPixels.getPixels(self)
+        self.model = Model.Model(self)
+        self.view = View.View(self)
 
 def main():
     c = Controller()

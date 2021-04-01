@@ -74,7 +74,7 @@ class Ui_TakeTrainingPictures(QWidget):
 
         self.labelPic = QLabel(Form)
         self.labelPic.setObjectName(u"labelPic")
-        self.labelPic.setGeometry(QRect(10, 40, 480, 320))
+        self.labelPic.setGeometry(QRect(10, 40, 640, 360))
 
         self.retranslateUi(Form)
 
@@ -90,12 +90,15 @@ class Ui_TakeTrainingPictures(QWidget):
 
     def displayFrame(self):
         ret, self.frame = self.cap.read()
+        #fgmask = self.fgbg.apply(self.frame)
+        #self.frame = cv2.bitwise_and(self.frame, self.frame, mask=fgmask)
         self.frame2 = cv2.cvtColor(self.frame, cv2.COLOR_BGR2RGB)
         self.image = qimage2ndarray.array2qimage(self.frame2)
         self.labelPic.setPixmap(QPixmap.fromImage(self.image))
 
     def run(self):
         self.cap = cv2.VideoCapture(1, cv2.CAP_DSHOW)
+        #self.fgbg = cv2.createBackgroundSubtractorMOG2()
         self.cap.set(cv2.CAP_PROP_FRAME_WIDTH, 480)
         self.cap.set(cv2.CAP_PROP_FRAME_HEIGHT, 320)
         self.timer = QTimer()
