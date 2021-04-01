@@ -1,8 +1,7 @@
 import numpy as np
 import cv2
 
-#img = cv2.imread('img/crayorescent_202141_025597.jpg')
-#image_blur = cv2.medianBlur(img,25)
+#
 # cap = cv2.VideoCapture(1, cv2.CAP_DSHOW)
 #
 # def empty(a):
@@ -49,12 +48,15 @@ import cv2
 #         break
 # cap.release()
 # cv2.destroyAllWindows()
+#
 
 
-lower_blue = np.array([89, 45, 46])
-upper_blue = np.array([102, 255, 154])
-lower_yellow = np.array([18, 52, 116])
-upper_yellow = np.array([23, 193, 243])
+
+
+lower_blue = np.array([91, 90, 50])
+upper_blue = np.array([102, 255, 128])
+lower_yellow = np.array([18, 119, 116])
+upper_yellow = np.array([23, 193, 225])
 lower_green = np.array([49, 148, 48])
 upper_green = np.array([70, 255, 156])
 lower_orange = np.array([172, 177, 148])
@@ -65,7 +67,6 @@ lower_pink = np.array([163, 145, 108])
 upper_pink = np.array([168, 255, 217])
 
 img = cv2.imread('img/crayorescent_202141_025597.jpg')
-#imghsv = cv2.cvtColor(img, cv2.COLOR_BGR2HSV)
 
 hsv = cv2.cvtColor(img, cv2.COLOR_BGR2HSV)
 mask_blue = cv2.inRange(hsv, lower_blue, upper_blue)
@@ -87,18 +88,18 @@ img4 = cv2.bitwise_and(img3, img3, mask = image_thresh_green)
 img5 = cv2.bitwise_and(img4, img4, mask = image_thresh_pink)
 image_res ,image_thresh_all = cv2.threshold(img5,1,255,cv2.THRESH_BINARY_INV)
 
-
 img = cv2.bitwise_and(img, img, mask = image_thresh_all)
-
+#kernel = np.ones((3,3),np.uint8)
+#opening = cv2.morphologyEx(img,cv2.MORPH_OPEN,kernel)
 Z = img.reshape((-1,3))
 Z = np.float32(Z)
 
 # define criteria, number of clusters(K) and apply kmeans()
-criteria = (cv2.TERM_CRITERIA_EPS + cv2.TERM_CRITERIA_MAX_ITER, 10, 1.0)
+criteria = (cv2.TERM_CRITERIA_EPS + cv2.TERM_CRITERIA_MAX_ITER, 20, 1.0)
 k = 7
 
-attemps = 10
-ret,label,center=cv2.kmeans(Z,k,None,criteria,attemps,cv2.KMEANS_PP_CENTERS)
+attempts = 20
+ret,label,center=cv2.kmeans(Z,k,None,criteria,attempts,cv2.KMEANS_PP_CENTERS)
 
 # Now convert back into uint8, and make original image
 center = np.uint8(center)
