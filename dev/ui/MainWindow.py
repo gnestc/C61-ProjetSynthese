@@ -125,7 +125,7 @@ class Ui_MainWindow(QMainWindow):
     # setupUi
 
     def retranslateUi(self, MainWindow):
-        MainWindow.setWindowTitle(QCoreApplication.translate("MainWindow", u"MainWindow", None))
+        MainWindow.setWindowTitle(QCoreApplication.translate("MainWindow", u"Main Menu", None))
         self.pushButton.setText(QCoreApplication.translate("MainWindow", u"Take training pictures", None))
         self.pushButton_2.setText(QCoreApplication.translate("MainWindow", u"Prepare dataset", None))
         self.pushButton_3.setText(QCoreApplication.translate("MainWindow", u"Detect items", None))
@@ -146,10 +146,11 @@ class Ui_MainWindow(QMainWindow):
     def onTakeTrainingPicturesClicked(self, checked):
         if self.w is None:
             self.w = Ui_TakeTrainingPictures()
-            self.w.setupUi(self.w)
+            self.w.setupUi(self, self.w)
             self.w.run()
         else :
             self.w.run()
         self.w.show()
+        self.hide()
 
 
