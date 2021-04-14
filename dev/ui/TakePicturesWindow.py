@@ -205,6 +205,8 @@ class Ui_TakeTrainingPictures(QWidget):
     def onBackClicked(self):
         self.textBrowser.setText("Select the color that matches the object, place the object in front of the camera on a white surface and take a photo.")
         self.close()
+        self.timer.stop()
+        self.cap.release()
         self.parent.show()
 
     def takeInDB(self):

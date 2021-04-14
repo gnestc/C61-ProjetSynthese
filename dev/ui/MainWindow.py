@@ -168,6 +168,10 @@ class Ui_MainWindow(QMainWindow):
         if self.w3 is None:
             self.w3 = Ui_DetectItems()
             self.w3.setupUi(self, self.w3)
+            self.w3.run()
+        else:
+            self.w3.run()
+            self.w3.onDatasetListRefresh()
         self.w3.show()
         self.hide()
 

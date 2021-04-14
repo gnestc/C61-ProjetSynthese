@@ -287,7 +287,7 @@ class Ui_PrepareDataset(QWidget):
     def onCreateClicked(self):
         dao = DAO()
         entryList = dao.getTrainingImages()
-        centers=[['Black', [0, 0, 0]]]
+        centers=[]
         for entry in entryList:
             byteimg = entry[2].tobytes()
             bufimg = np.frombuffer(byteimg, dtype=np.uint8)
@@ -320,5 +320,3 @@ class Ui_PrepareDataset(QWidget):
         dao.insertDataset(centers, dateString)
         self.textBrowser.setText("Color values from "+str(len(centers)-1)+ " photos were successfully saved.")
         self.onDatasetListRefresh()
-
-
