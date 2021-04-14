@@ -1,14 +1,9 @@
-import binascii
-import os
-
 from PySide2.QtCore import *
 from PySide2.QtGui import *
 from PySide2.QtWidgets import *
 
 import cv2
 import numpy as np
-from PIL import Image
-import io
 import qimage2ndarray
 from datetime import datetime as dt
 from dev.DAO import DAO
@@ -18,11 +13,11 @@ class Ui_TakeTrainingPictures(QWidget):
     def setupUi(self, parent, Form):
         self.parent = parent
         self.entryList = None
+        self.frame = None
         if not Form.objectName():
             Form.setObjectName(u"Form")
         Form.resize(1080, 720)
         Form.setStyleSheet(u"background-color: rgb(13, 16, 13);")
-        self.frame = None
         self.back = QPushButton(Form)
         self.back.setObjectName(u"back")
         self.back.setGeometry(QRect(40, 640, 91, 40))
@@ -164,12 +159,11 @@ class Ui_TakeTrainingPictures(QWidget):
         QMetaObject.connectSlotsByName(Form)
     # setupUi
 
+
     def retranslateUi(self, Form):
         Form.setWindowTitle(QCoreApplication.translate("Form", u"Take Training Pictures", None))
         self.back.setText(QCoreApplication.translate("Form", u"Back", None))
         self.takebtn.setText(QCoreApplication.translate("Form", u"Take", None))
-        #self.selectedimage.setText("")
-        #self.comboBox.setPlaceholderText(QCoreApplication.translate("Form", u"Select a color", None))
         self.textBrowser.setHtml(QCoreApplication.translate("Form",
                                                             u"<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.0//EN\" \"http://www.w3.org/TR/REC-html40/strict.dtd\">\n"
                                                             "<html><head><meta name=\"qrichtext\" content=\"1\" /><style type=\"text/css\">\n"
@@ -188,17 +182,17 @@ class Ui_TakeTrainingPictures(QWidget):
 
     def displayFrame(self):
         ret, self.frame = self.cap.read()
-        #fgmask = self.fgbg.apply(self.frame)
-        #self.frame = cv2.bitwise_and(self.frame, self.frame, mask=fgmask)
         self.frame2 = cv2.cvtColor(self.frame, cv2.COLOR_BGR2RGB)
         self.image = qimage2ndarray.array2qimage(self.frame2)
         self.livecam.setPixmap(QPixmap.fromImage(self.image))
 
     def run(self):
         self.cap = cv2.VideoCapture(1, cv2.CAP_DSHOW)
-        #self.fgbg = cv2.createBackgroundSubtractorMOG2()
+        if self.cap is None or not self.cap.isOpened():
+            self.cap = cv2.VideoCapture(0, cv2.CAP_DSHOW)
         self.cap.set(cv2.CAP_PROP_FRAME_WIDTH, 480)
         self.cap.set(cv2.CAP_PROP_FRAME_HEIGHT, 320)
+
         self.timer = QTimer()
         self.timer.timeout.connect(self.displayFrame)
         self.timer.start(60)
@@ -206,22 +200,12 @@ class Ui_TakeTrainingPictures(QWidget):
     def closeEvent(self, event) :
         self.timer.stop()
         self.cap.release()
+        self.parent.close()
 
     def onBackClicked(self):
         self.textBrowser.setText("Select the color that matches the object, place the object in front of the camera on a white surface and take a photo.")
         self.close()
         self.parent.show()
-
-    def closeEvent(self, event):
-        self.parent.close()
-
-    def take(self):
-        if self.frame.any() != None:
-            date = dt.now()
-            img_name = "crayorescent_"+str(date.year)+str(date.month)+str(date.day)+"_"+str(date.hour)+str(date.minute)+str(date.second)+str(date.microsecond%10)+".jpg"
-            path = "C:/Users/gnest/Documents/GitHub/C61-ProjetSynthese/dev/img/"
-            cv2.imwrite(os.path.join(path, img_name), self.frame)
-            print("Image saved")
 
     def takeInDB(self):
         if self.frame.any() != None and self.comboBox.currentIndex() != 0:
@@ -245,14 +229,14 @@ class Ui_TakeTrainingPictures(QWidget):
                 self.photoList.addItem('{:12}'.format(entry[1])+entry[0])
             self.photoList.repaint()
 
-            self.selectedimageResfresh(-1)
+            self.selectedimageRefresh(-1)
 
     def onListClicked(self):
         row = self.photoList.currentRow()
-        self.selectedimageResfresh(row)
+        self.selectedimageRefresh(row)
         self.textBrowser.setText("Image as saved in the database")
 
-    def selectedimageResfresh(self, row):
+    def selectedimageRefresh(self, row):
         byteimg=self.entryList[row][2].tobytes()
         bufimg = np.frombuffer(byteimg, dtype=np.uint8)
         bufimg = bufimg.reshape(360, 640, 3)

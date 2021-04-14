@@ -41,3 +41,84 @@ class DAO:
         conn.commit()
         cur.close()
         conn.close()
+
+    def getImagesByColor(self, color):
+        conn = psycopg2.connect(
+            host="localhost",
+            database="c61projetsynthesedb",
+            user="postgres",
+            password="123")
+        cur = conn.cursor()
+        cur.execute("SELECT * FROM training_images "+
+                    "WHERE color LIKE %s",
+                    (color,))
+        images=cur.fetchall()
+        cur.close()
+        conn.close()
+        return images
+
+    def insertDataset(self, centers, dateString):
+        conn = psycopg2.connect(
+            host="localhost",
+            database="c61projetsynthesedb",
+            user="postgres",
+            password="123")
+        cur = conn.cursor()
+        cur.execute("INSERT INTO datasets_by_date(date) " +
+                    "VALUES(%s)",
+                    (dateString,))
+        conn.commit()
+
+        for center in centers:
+            cur.execute("INSERT INTO datasets_content(color, rgb, dataset) " +
+                        "VALUES(%s, %s, (SELECT dataset FROM datasets_by_date WHERE date = %s))",
+                        (center[0], center[1], dateString))
+            conn.commit()
+        cur.close()
+        conn.close()
+
+    def getDatasetsByDate(self):
+        conn = psycopg2.connect(
+            host="localhost",
+            database="c61projetsynthesedb",
+            user="postgres",
+            password="123")
+        cur = conn.cursor()
+        cur.execute("SELECT * FROM datasets_by_date ")
+        data=cur.fetchall()
+        cur.close()
+        conn.close()
+        return data
+
+    def getDatasetsContent(self, datasetNum):
+        conn = psycopg2.connect(
+            host="localhost",
+            database="c61projetsynthesedb",
+            user="postgres",
+            password="123")
+        cur = conn.cursor()
+        cur.execute("SELECT color, rgb FROM datasets_content "+
+                    "WHERE dataset = %s",
+                    (datasetNum,))
+        data=cur.fetchall()
+        cur.close()
+        conn.close()
+        return data
+
+    def deleteDataset(self, datasetNum):
+        conn = psycopg2.connect(
+            host="localhost",
+            database="c61projetsynthesedb",
+            user="postgres",
+            password="123")
+        cur = conn.cursor()
+        cur.execute("DELETE FROM datasets_content "+
+                    "WHERE dataset = %s",
+                    (datasetNum,))
+        conn.commit()
+        cur.execute("DELETE FROM datasets_by_date "+
+                    "WHERE dataset = %s",
+                    (datasetNum,))
+        conn.commit()
+        cur.close()
+        conn.close()
