@@ -122,3 +122,45 @@ class DAO:
         conn.commit()
         cur.close()
         conn.close()
+
+    def getMask(self, color):
+        conn = psycopg2.connect(
+            host="localhost",
+            database="c61projetsynthesedb",
+            user="postgres",
+            password="123")
+        cur = conn.cursor()
+        cur.execute("SELECT * FROM masks "+
+                    "WHERE color LIKE %s",
+                    (color,))
+        data=cur.fetchall()
+        cur.close()
+        conn.close()
+        return data
+
+    def getAllMasks(self):
+        conn = psycopg2.connect(
+            host="localhost",
+            database="c61projetsynthesedb",
+            user="postgres",
+            password="123")
+        cur = conn.cursor()
+        cur.execute("SELECT * FROM masks ")
+        data=cur.fetchall()
+        cur.close()
+        conn.close()
+        return data
+
+    def updateMask(self, savedValues):
+        conn = psycopg2.connect(
+            host="localhost",
+            database="c61projetsynthesedb",
+            user="postgres",
+            password="123")
+        cur = conn.cursor()
+        cur.execute("UPDATE masks SET hsv_min = %s, hsv_max= %s "+
+                    "WHERE color LIKE %s",
+                    (savedValues[1], savedValues[2], savedValues[0]))
+        conn.commit()
+        cur.close()
+        conn.close()

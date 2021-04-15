@@ -15,6 +15,7 @@ class Ui_PrepareDataset(QWidget):
         self.entryList = None
         self.datasets = None
         self.colorValues = None
+
         if not Form.objectName():
             Form.setObjectName(u"Form")
         Form.resize(1080, 720)
@@ -51,7 +52,7 @@ class Ui_PrepareDataset(QWidget):
 
         self.photoList = QListWidget(Form)
         self.photoList.setObjectName(u"photoList")
-        self.photoList.setGeometry(QRect(70, 360, 481, 211))
+        self.photoList.setGeometry(QRect(70, 360, 481, 161))
         self.photoList.clicked.connect(self.onListClicked)
         self.photoList.setStyleSheet(u"QListWidget\n"
                                       "{\n"
@@ -157,6 +158,32 @@ class Ui_PrepareDataset(QWidget):
                                       "{\n"
                                       "	background-color: rgb(113, 203, 103);\n"
                                       "}")
+
+        self.mask_btn = QPushButton(Form)
+        self.mask_btn.setObjectName(u"mask_btn")
+        self.mask_btn.setGeometry(QRect(460, 530, 93, 40))
+        self.mask_btn.setFont(font)
+        self.mask_btn.clicked.connect(self.onMaskBtnClicked)
+        self.mask_btn.setStyleSheet(u"QPushButton\n"
+                                      "{\n"
+                                      "	border: 1px solid rgb(113, 203, 103);\n"
+                                      "	border-radius: 20px;\n"
+                                      "	color: #FFF;\n"
+                                      "	padding-left: 20px;\n"
+                                      "	padding-right: 20px;\n"
+                                      "	background-color: rgb(30, 36, 30);\n"
+                                      "}\n"
+                                      "\n"
+                                      "QPushButton::hover\n"
+                                      "{\n"
+                                      "	background-color: rgb(63, 76, 63);\n"
+                                      "}\n"
+                                      "\n"
+                                      "QPushButton::pressed\n"
+                                      "{\n"
+                                      "	background-color: rgb(113, 203, 103);\n"
+                                      "}")
+
         self.onDatasetListRefresh()
 
         self.retranslateUi(Form)
@@ -176,13 +203,22 @@ class Ui_PrepareDataset(QWidget):
         #self.label.setText(QCoreApplication.translate("Form", u"TextLabel", None))
         self.create.setText(QCoreApplication.translate("Form", u"Create", None))
         self.delete_btn.setText(QCoreApplication.translate("Form", u"Delete", None))
+        self.mask_btn.setText(QCoreApplication.translate("Form", u"Masks", None))
     # retranslateUi
 
+
     def onBackClicked(self):
+        self.comboBox.setCurrentIndex(0)
         self.textBrowser.setText("Select a color to verify the application of its mask or create a new dataset. The new dataset will contain the main color of every saved photo.\n"+
         "You can select the image on which you want to check the fit of the mask of the specified color. If the mask doesn't fit, take another picture with better lighting in previous step or change mask values.")
         self.close()
         self.parent.show()
+
+    def onMaskBtnClicked(self):
+        if self.comboBox.currentIndex() != 0:
+            self.parent.onMaskClicked(self.comboBox.currentText())
+        else:
+            self.textBrowser.setText("Select a color to access its mask values")
 
     def on_combobox_changed(self):
         if self.comboBox.currentIndex() != 0:
@@ -198,18 +234,18 @@ class Ui_PrepareDataset(QWidget):
                 self.photoList.addItem('{:12}'.format(entry[1])+entry[0])
             self.photoList.repaint()
             self.textBrowser.setText(str(len(self.entryList))+" "+color+" images were found. A minimum of 15 images is recommended.")
-            self.selectedimageResfresh(-1)
+            self.selectedimageRefresh(-1)
         elif len(self.entryList) == 1:
             self.photoList.addItem('{:12}'.format(self.entryList[0][1]) + self.entryList[0][0])
             self.photoList.repaint()
             self.textBrowser.setText("Only "+str(len(self.entryList))+" "+color+" image was found. A minimum of 15 images is recommended.")
-            self.selectedimageResfresh(-1)
+            self.selectedimageRefresh(-1)
         elif len(self.entryList) == 0:
             self.textBrowser.setText("No " + color + " photos were found")
 
     def onListClicked(self):
         row = self.photoList.currentRow()
-        self.selectedimageResfresh(row)
+        self.selectedimageRefresh(row)
         self.textBrowser.setText("Image with its color mask")
 
     def onDatasetListRefresh(self):
@@ -247,27 +283,15 @@ class Ui_PrepareDataset(QWidget):
         self.onDatasetListRefresh()
 
     def getColorMaskValue(self, color):
-        if color == "Red":
-            lower = np.array([173, 192, 71])
-            upper = np.array([179, 255, 152])
-        elif color == "Blue":
-            lower = np.array([91, 90, 50])
-            upper = np.array([102, 255, 128])
-        elif color == "Yellow":
-            lower = np.array([18, 119, 116])
-            upper = np.array([23, 193, 225])
-        elif color == "Green":
-            lower = np.array([49, 148, 48])
-            upper = np.array([70, 255, 156])
-        elif color == "Orange":
-            lower = np.array([0, 177, 96])
-            upper = np.array([179, 255, 255])
-        elif color == "Pink":
-            lower = np.array([163, 145, 108])
-            upper = np.array([168, 255, 217])
+        dao = DAO()
+        mask = dao.getMask(color)
+
+        lower = np.array(mask[0][1])
+        upper = np.array(mask[0][2])
+
         return lower, upper
 
-    def selectedimageResfresh(self, row):
+    def selectedimageRefresh(self, row):
         byteimg=self.entryList[row][2].tobytes()
         bufimg = np.frombuffer(byteimg, dtype=np.uint8)
         shapedimg = bufimg.reshape(360, 640, 3)
@@ -287,7 +311,7 @@ class Ui_PrepareDataset(QWidget):
     def onCreateClicked(self):
         dao = DAO()
         entryList = dao.getTrainingImages()
-        centers=[]
+        centers=[["No object", [0, 0, 0]]]
         for entry in entryList:
             byteimg = entry[2].tobytes()
             bufimg = np.frombuffer(byteimg, dtype=np.uint8)
@@ -312,7 +336,10 @@ class Ui_PrepareDataset(QWidget):
 
             center = np.uint8(center)
             center = center.tolist()
-            center = [color, center[1]]
+            if center[1][0] != 0 and center[1][1] != 0 and center[1][2] != 0 :
+                center = [color, center[1]]
+            else:
+                center = [color, center[0]]
             centers.append(center)
 
         date = dt.now()
