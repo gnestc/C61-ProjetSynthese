@@ -74,6 +74,7 @@ class Ui_DetectItems(QWidget):
         self.select = QPushButton(Form)
         self.select.setObjectName(u"select")
         self.select.setGeometry(QRect(670, 600, 91, 40))
+        self.select.clicked.connect(self.onSelectClicked)
         self.select.setStyleSheet(u"QPushButton\n"
                                   "{\n"
                                   "	border: 1px solid rgb(113, 203, 103);\n"
@@ -101,10 +102,8 @@ class Ui_DetectItems(QWidget):
         self.label_2.setFrameShape(QFrame.StyledPanel)
 
         self.onDatasetListRefresh()
-
-        self.timerDetect = QTimer()
-        self.timerDetect.timeout.connect(self.detect)
-        self.timerDetect.start(2000)
+        self.startTimer()
+        self.currentRow = self.listWidget.currentRow()
 
         self.retranslateUi(Form)
         QMetaObject.connectSlotsByName(Form)
@@ -124,20 +123,23 @@ class Ui_DetectItems(QWidget):
                                                             None))
     # retranslateUi
 
+    def startTimer(self):
+        self.timerDetect = QTimer()
+        self.timerDetect.timeout.connect(self.detect)
+        self.timerDetect.start(2000)
+
     def detect(self):
         colorDetect = ColorRecognition()
         center=colorDetect.run(self.frame)
         if center[0]==0 and center[1]==0 and center[2]==0:
-            self.textBrowser.setText("No object detected")
+            self.textBrowser.setText("No object")
         else:
-            datasetNum = self.datasets[self.listWidget.currentRow()][0]
+            datasetNum = self.datasets[self.currentRow][0]
             dao = DAO()
             self.colorValues = dao.getDatasetsContent(datasetNum)
             self.knn(center, self.colorValues)
 
     def knn(self, center, colorValues):
-        #print(center, colorValues)
-
         distances=[]
         for pt in colorValues :
             res=math.sqrt(math.pow(center[0]-pt[1][0], 2)+math.pow(center[1]-pt[1][1], 2) + math.pow(center[2]-pt[1][2], 2))
@@ -172,9 +174,11 @@ class Ui_DetectItems(QWidget):
                 self.listWidget.addItem('{:12}'.format("DS no."+str(dataset[0])) + dataset[1])
             self.listWidget.repaint()
 
+    def onSelectClicked(self):
+        self.currentRow = self.listWidget.currentRow()
+        self.textBrowser.setText("Dataset selection changed")
+
     def onBackClicked(self):
-        #self.textBrowser.setText("Select a color to verify the application of its mask or create a new dataset. The new dataset will contain the main color of every saved photo.\n"+
-        #"You can select the image on which you want to check the fit of the mask of the specified color. If the mask doesn't fit, take another picture with better lighting in previous step or change mask values.")
         self.onDatasetListRefresh()
         self.close()
         self.timer.stop()
@@ -183,8 +187,6 @@ class Ui_DetectItems(QWidget):
         self.parent.show()
 
     def closeEvent(self, event) :
-        #self.timer.stop()
-        #self.cap.release()
         self.timer.stop()
         self.timerDetect.stop()
         self.cap.release()

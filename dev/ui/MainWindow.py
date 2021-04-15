@@ -4,12 +4,15 @@ from PySide2.QtWidgets import *
 from dev.ui.TakePicturesWindow import Ui_TakeTrainingPictures
 from dev.ui.PrepareDatasetWindow import Ui_PrepareDataset
 from dev.ui.DetectItems import Ui_DetectItems
+from dev.MaskConfig import MaskConfig
 
 class Ui_MainWindow(QMainWindow):
     def setupUi(self, MainWindow):
         self.w1 = None
         self.w2 = None
         self.w3 = None
+        self.maskWindow = None
+
         if not MainWindow.objectName():
             MainWindow.setObjectName(u"MainWindow")
         MainWindow.resize(1080, 720)
@@ -154,6 +157,7 @@ class Ui_MainWindow(QMainWindow):
             self.w1.run()
         else :
             self.w1.run()
+            self.w1.comboBox.setCurrentIndex(-1)
         self.w1.show()
         self.hide()
 
@@ -161,6 +165,8 @@ class Ui_MainWindow(QMainWindow):
         if self.w2 is None:
             self.w2 = Ui_PrepareDataset()
             self.w2.setupUi(self, self.w2)
+        else:
+            self.w2.photoList.clear()
         self.w2.show()
         self.hide()
 
@@ -170,9 +176,23 @@ class Ui_MainWindow(QMainWindow):
             self.w3.setupUi(self, self.w3)
             self.w3.run()
         else:
-            self.w3.run()
             self.w3.onDatasetListRefresh()
+            self.w3.startTimer()
+            self.w3.run()
+
         self.w3.show()
         self.hide()
+
+    def onMaskClicked(self, color):
+        if self.maskWindow is None:
+            self.maskWindow = MaskConfig()
+            self.maskWindow.setupUi(self, self.maskWindow)
+            self.maskWindow.config(color)
+            self.maskWindow.run()
+        else:
+            self.maskWindow.config(color)
+            self.maskWindow.run()
+        self.maskWindow.show()
+        self.w2.hide()
 
 

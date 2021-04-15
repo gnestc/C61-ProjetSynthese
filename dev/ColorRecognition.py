@@ -1,20 +1,24 @@
 import numpy as np
 import cv2
+from dev.DAO import DAO
 
 class ColorRecognition():
     def run(self, sentImg):
-        lower_blue = np.array([91, 90, 50])
-        upper_blue = np.array([102, 255, 128])
-        lower_yellow = np.array([18, 119, 116])
-        upper_yellow = np.array([23, 193, 225])
-        lower_green = np.array([49, 148, 48])
-        upper_green = np.array([70, 255, 156])
-        lower_orange = np.array([0, 177, 96])
-        upper_orange = np.array([179, 255, 255])
-        lower_red = np.array([173, 192, 71])
-        upper_red = np.array([179, 255, 152])
-        lower_pink = np.array([163, 145, 108])
-        upper_pink = np.array([168, 255, 217])
+        dao = DAO()
+        masks = dao.getAllMasks()
+
+        lower_blue = np.array(masks[0][1])
+        upper_blue = np.array(masks[0][2])
+        lower_yellow = np.array(masks[1][1])
+        upper_yellow = np.array(masks[1][2])
+        lower_green = np.array(masks[2][1])
+        upper_green = np.array(masks[2][2])
+        lower_orange = np.array(masks[3][1])
+        upper_orange = np.array(masks[3][2])
+        lower_red = np.array(masks[4][1])
+        upper_red = np.array(masks[4][2])
+        lower_pink = np.array(masks[5][1])
+        upper_pink = np.array(masks[5][2])
 
         img = sentImg
 
@@ -56,11 +60,3 @@ class ColorRecognition():
         center = center.tolist()
         center = center[1]
         return center
-
-        #print(center)
-        #res = center[label.flatten()]
-        #res2 = res.reshape((img.shape))
-
-        #cv2.imshow('res2', res2)
-        #cv2.waitKey(0)
-        #cv2.destroyAllWindows()

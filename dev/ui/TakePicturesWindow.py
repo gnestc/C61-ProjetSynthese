@@ -124,7 +124,6 @@ class Ui_TakeTrainingPictures(QWidget):
         self.textBrowser.setStyleSheet(u"QTextBrowser{\n"
                                        "	color: #FFF;\n"
                                        "}")
-        self.textBrowser.setText("Select a color, place the object in front of the camera on a white surface and take a photo.")
 
         self.delete_btn = QPushButton(Form)
         self.delete_btn.setObjectName(u"delete_btn")
