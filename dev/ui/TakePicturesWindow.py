@@ -196,7 +196,7 @@ class Ui_TakeTrainingPictures(QWidget):
         self.timer.timeout.connect(self.displayFrame)
         self.timer.start(60)
 
-    def closeEvent(self, event) :
+    def closeEvent(self, event):
         self.timer.stop()
         self.cap.release()
         self.parent.close()

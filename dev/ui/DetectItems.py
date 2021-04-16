@@ -146,7 +146,7 @@ class Ui_DetectItems(QWidget):
             distances.append(res)
         lowest=min(distances)
         index=distances.index(lowest)
-        self.textBrowser.setText(str(colorValues[index][0]))
+        self.textBrowser.setText(str(colorValues[index][0])+"     "+str(center))
 
     def displayFrame(self):
         ret, self.frame = self.cap.read()

@@ -344,6 +344,7 @@ class Ui_PrepareDataset(QWidget):
 
         date = dt.now()
         dateString = "Created on " + str(date.year) + "/" + str(date.month) + "/" + str(date.day) + " at " + str(date.hour) + ":" + str(date.minute) + ":" + str(date.second) + ":" + str(date.microsecond % 10)
+        dao = DAO()
         dao.insertDataset(centers, dateString)
         self.textBrowser.setText("Color values from "+str(len(centers)-1)+ " photos were successfully saved.")
         self.onDatasetListRefresh()
