@@ -157,7 +157,7 @@ class Ui_MainWindow(QMainWindow):
             self.w1.run()
         else :
             self.w1.run()
-            self.w1.comboBox.setCurrentIndex(-1)
+            self.w1.comboBox.setCurrentIndex(0)
         self.w1.show()
         self.hide()
 

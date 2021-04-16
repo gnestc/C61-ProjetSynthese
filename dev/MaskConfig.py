@@ -322,6 +322,7 @@ class MaskConfig(QWidget):
         self.cap.release()
         self.parent.w2.selectedimageRefresh(-1)
         self.parent.w2.show()
+        self.textBrowser.setText("Put an object of the selected color on a white surface in front of the camera. Drag each of the sliders until the color is isolated and save your changes.")
 
     def closeEvent(self, event) :
         self.timer.stop()
