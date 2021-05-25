@@ -1,3 +1,5 @@
+# Référence - Exemple de code du K-Means tel que fourni par OpenCV :
+# https://docs.opencv.org/master/d1/d5c/tutorial_py_kmeans_opencv.html
 import numpy as np
 import cv2
 from dev.DAO import DAO
