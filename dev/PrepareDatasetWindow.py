@@ -229,7 +229,7 @@ class Ui_PrepareDataset(QWidget):
         dao = DAO()
         self.entryList = dao.getImagesByColor(color)
         self.photoList.clear()
-        if len(self.entryList) <= 15 and len(self.entryList) >= 2:
+        if len(self.entryList) >= 2:
             for entry in self.entryList:
                 self.photoList.addItem('{:12}'.format(entry[1])+entry[0])
             self.photoList.repaint()
